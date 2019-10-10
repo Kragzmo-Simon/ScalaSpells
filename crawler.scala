@@ -7,17 +7,6 @@ import java.nio.file.{Paths, Files}
 
 import scala.collection.mutable.ArrayBuffer
 
-class Spell(tc :  String, lc : String, cc : String, sc : Boolean) {
-  var title : String = tc
-  var levels : String = lc
-  var components : String = cc
-  var spellResistance : Boolean = sc
-
-  def selfPrint(): Unit = {
-    println("ScalaSpells.Spell ",title,", levels ",levels,", components ",components,", spell resistance ",spellResistance)
-  }
-}
-
 class TestSpider extends DefaultSpider {
   var startUrl = List[String]("http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=1")
 
