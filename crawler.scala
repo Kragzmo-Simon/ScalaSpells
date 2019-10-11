@@ -88,8 +88,8 @@ object Crawling {
         file_to_check.delete()
       }
     }
-    
-    for (i <- 1 to 10) {
+
+    for (i <- 1 to 1975) {
       val newUrl = "http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=" + i.toString()
       val newUrlCollection = newUrl :: crawler.startUrl
       crawler.startUrl = newUrlCollection

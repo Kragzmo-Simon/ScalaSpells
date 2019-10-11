@@ -1,10 +1,9 @@
-
+package ScalaSpells
 import javax.print.attribute.standard.PageRanges
 import org.apache.spark.graphx.{Edge, Graph, TripletFields}
 import org.apache.spark.{SparkConf, SparkContext}
 
 
-package ScalaSpells
 
 class node(val id: Int, val pageRank: Double , val link: Int) extends Serializable {
     override def toString: String = s"id : $id pageRank : $pageRank nombre de lien : $link "
@@ -81,7 +80,7 @@ class node(val id: Int, val pageRank: Double , val link: Int) extends Serializab
 
   object pagerank extends App {
     val conf = new SparkConf()
-      .setAppName("Petersen Graph version Examen")
+      .setAppName("PageRank")
       .setMaster("local[*]")
     val sc = SparkContext.getOrCreate(conf)
     sc.setLogLevel("ERROR")
