@@ -39,7 +39,11 @@ class TestSpider extends DefaultSpider {
     // spell resistance
     var spellResist = "false"
     if (SpDet.html().contains("Spell Resistance")) {
-      spellResist = SpDet.get(6).text().split(";").last.trim().substring(17)
+      for (element <- SpDet.last().text().split(";")) {
+        if (element.contains("Spell Resistance")) {
+          spellResist = element.trim().substring(17)
+        }
+      }
     }
     if (spellResist.contains("yes")) {
       spellResist = "true"
@@ -89,10 +93,16 @@ object Crawling {
       }
     }
 
-    for (i <- 1 to 1975) {
-      val newUrl = "http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=" + i.toString()
-      val newUrlCollection = newUrl :: crawler.startUrl
-      crawler.startUrl = newUrlCollection
+
+    val last_page_index = 1600
+    val forbidden_index = Array(1841,1972)
+
+    for (index <- 1 to last_page_index) {
+      if (!forbidden_index.contains(index)) {
+        val newUrl = "http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=" + index.toString()
+        val newUrlCollection = newUrl :: crawler.startUrl
+        crawler.startUrl = newUrlCollection
+      }
     }
 
     crawler begin
