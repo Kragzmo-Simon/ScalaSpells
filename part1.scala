@@ -21,6 +21,7 @@ object Part1 {
   def collect_spells(filename : String, spell_collection : ArrayBuffer[Spell]): Unit = {
     for (line <- Source.fromFile(filename).getLines) {
       val spell_infos =  line.split(";")
+      //                        title           levels          components      spell resistance
       val new_spell = new Spell(spell_infos(0), spell_infos(1), spell_infos(2), spell_infos(3).toBoolean)
       spell_collection.append(new_spell)
     }
@@ -47,15 +48,13 @@ object Part1 {
   }
 
   def main(args: Array[String]): Unit = {
-
     val spell_collection = new ArrayBuffer[Spell]()
 
     for (i <- 0 to 30) {
       val fileName = "spells_thread" + i + ".txt"
       val file_to_check = new File(fileName)
-      val exist = file_to_check.exists()
 
-      if (exist) {
+      if (file_to_check.exists()) {
         collect_spells(fileName, spell_collection)
       }
     }
@@ -68,10 +67,8 @@ object Part1 {
 
     val spellsRDD = sc.makeRDD(spell_collection)
 
-    val pito_spells = spellsRDD.filter(
-      spell => {
-        if (is_wizard_spell(spell) && is_verbal_spell(spell) && (get_spell_wizard_level(spell) < 5))  true else false
-      }
+    val Pito_spells = spellsRDD.filter(
+      spell => if (is_wizard_spell(spell) && is_verbal_spell(spell) && (get_spell_wizard_level(spell) < 5))  true else false
     )
 
     /*
@@ -81,7 +78,7 @@ object Part1 {
     }
     println("\n\n")
      */
-    println(pito_spells.count())
+    println(Pito_spells.count())
   }
 }
 
