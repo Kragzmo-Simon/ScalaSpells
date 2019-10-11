@@ -16,7 +16,7 @@ class Spell(tc :  String, lc : String, cc : String, sc : Boolean) extends Serial
   }
 }
 
-object Part1 {
+object Pito {
 
   def collect_spells(filename : String, spell_collection : ArrayBuffer[Spell]): Unit = {
     for (line <- Source.fromFile(filename).getLines) {

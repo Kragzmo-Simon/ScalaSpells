@@ -8,47 +8,65 @@ import java.nio.file.{Paths, Files}
 import scala.collection.mutable.ArrayBuffer
 
 class TestSpider extends DefaultSpider {
-  var startUrl = List[String]("http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=1")
+  var startUrl = List[String]()
 
-  def parse(response: HttpResponse): Unit = {
+  def get_spell_informations(response: HttpResponse): Array[String] = {
+    val spell_inf = new Array[String](4)
+
     val content = response.getContentParser()
     val spellInformation = content.select("div[class=SpellDiv]")
     val SpDet = spellInformation.select("p[class=SpDet]")
 
-    val title = spellInformation.select("div[class=heading]").first.text()
-    val levels = SpDet.first.text()
-    val components = SpDet.get(2).text()
+    // title
+    val spell_title = spellInformation.select("div[class=heading]").first.text()
+    spell_inf(0) = spell_title
 
-    var spellResist = "no"
+    // levels
+    val levels = SpDet.first.text()
+    val spell_levels = levels.split(";").last.trim().substring(6)
+    spell_inf(1) = spell_levels
+
+    // components
+    val components = SpDet.get(2).text()
+    var spell_components = ""
+    for (c <- components.substring(11)) {
+      if (c.isUpper) {
+        spell_components += c
+      }
+    }
+    spell_inf(2) = spell_components
+
+    // spell resistance
+    var spellResist = "false"
     if (SpDet.html().contains("Spell Resistance")) {
       spellResist = SpDet.get(6).text().split(";").last.trim().substring(17)
     }
-
-    val spellTitle = title
-    val spellLevels = levels.split(";").last.trim().substring(6)
-    var spellComponents = ""
-    var spellResistance = true
-
-    for (c <- components.substring(11)) {
-      if (c.isUpper) {
-        spellComponents += c
-      }
+    if (spellResist.contains("yes")) {
+      spellResist = "true"
+    } else {
+      spellResist = "false"
     }
+    spell_inf(3) = spellResist
 
-    if (spellResist.equals("no")) {
-      spellResistance = false
-    }
+    spell_inf
+  }
 
-    //val newSpell = new Spell(spellTitle,spellLevels,spellComponents,spellResistance)
-    val file_line = spellTitle + ";" + spellLevels + ";" + spellComponents + ";" + spellResistance + "\n"
+  def parse(response: HttpResponse): Unit = {
+
+    val spell_information = get_spell_informations(response)
+    val spellTitle = spell_information(0)
+    val spellLevels = spell_information(1)
+    val spellComponents = spell_information(2)
+    val spellResistance = spell_information(3)
+
+    val spell_line = spellTitle + ";" + spellLevels + ";" + spellComponents + ";" + spellResistance + "\n"
 
     val fileName = "spells_thread" + Thread.currentThread().getId() + ".txt"
     val fw = new FileWriter(fileName, true)
     try {
-      fw.write( file_line )
+      fw.write( spell_line )
     }
     finally fw.close()
-
   }
 
   def printIt(response: HttpResponse): Unit = {
@@ -56,10 +74,11 @@ class TestSpider extends DefaultSpider {
   }
 }
 
-object Main {
+object Crawling {
   def main(args: Array[String]) {
     val crawler = new TestSpider
 
+    // close existing files
     for (i <- 0 to 30) {
       val fileName = "spells_thread" + i + ".txt"
 
@@ -70,13 +89,13 @@ object Main {
       }
     }
 
-    for (i <- 2 to 10) {
+    for (i <- 1 to 10) {
       val newUrl = "http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=" + i.toString()
       val newUrlCollection = newUrl :: crawler.startUrl
       crawler.startUrl = newUrlCollection
     }
 
-      crawler begin
+    crawler begin
 
   }
 }
