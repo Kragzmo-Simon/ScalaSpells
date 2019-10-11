@@ -5,7 +5,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
-class Spell(tc :  String, lc : String, cc : String, sc : Boolean) {
+class Spell(tc :  String, lc : String, cc : String, sc : Boolean) extends Serializable {
   var title : String = tc
   var levels : String = lc
   var components : String = cc
@@ -26,10 +26,29 @@ object Part1 {
     }
   }
 
+  def get_spell_wizard_level(spell : Spell): Int = {
+    val levels = spell.levels.split(",")
+    var def_level = levels(0).trim().last
+    for (element <- levels) {
+      if (element.contains("wizard")) {
+        def_level = element.trim().last
+      }
+    }
+    val level = def_level.toInt - '0'.toInt
+    level
+  }
+
+  def is_wizard_spell(spell : Spell): Boolean = {
+    if (spell.levels.contains("wizard")) true else false
+  }
+
+  def is_verbal_spell(spell : Spell): Boolean = {
+    if (spell.components.equals("V")) true else false
+  }
+
   def main(args: Array[String]): Unit = {
 
-    //var spell_collection = new Array[Spell](2000)
-    var spell_collection = new ArrayBuffer[Spell]()
+    val spell_collection = new ArrayBuffer[Spell]()
 
     for (i <- 0 to 30) {
       val fileName = "spells_thread" + i + ".txt"
@@ -41,12 +60,6 @@ object Part1 {
       }
     }
 
-    /*
-    for (spell <- spell_collection) {
-      spell.selfPrint()
-    }
-    */
-
     val conf = new SparkConf()
       .setAppName("Spells")
       .setMaster("local[*]")
@@ -55,9 +68,20 @@ object Part1 {
 
     val spellsRDD = sc.makeRDD(spell_collection)
 
-    println(spellsRDD.getClass().getName())
-    println(spellsRDD.count())
+    val pito_spells = spellsRDD.filter(
+      spell => {
+        if (is_wizard_spell(spell) && is_verbal_spell(spell) && (get_spell_wizard_level(spell) < 5))  true else false
+      }
+    )
 
+    /*
+    println("\n\n")
+    for (element <- dem_spells.collect()) {
+      element.selfPrint()
+    }
+    println("\n\n")
+     */
+    println(pito_spells.count())
   }
 }
 
