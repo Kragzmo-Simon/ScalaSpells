@@ -95,14 +95,11 @@ object Crawling {
 
 
     val last_page_index = 1600
-    val forbidden_index = Array(1841,1972)
 
     for (index <- 1 to last_page_index) {
-      if (!forbidden_index.contains(index)) {
-        val newUrl = "http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=" + index.toString()
-        val newUrlCollection = newUrl :: crawler.startUrl
-        crawler.startUrl = newUrlCollection
-      }
+      val newUrl = "http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=" + index.toString()
+      val newUrlCollection = newUrl :: crawler.startUrl
+      crawler.startUrl = newUrlCollection
     }
 
     crawler begin

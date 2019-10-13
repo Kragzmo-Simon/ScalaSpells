@@ -71,14 +71,11 @@ object Pito {
       spell => if (is_wizard_spell(spell) && is_verbal_spell(spell) && (get_spell_wizard_level(spell) < 5))  true else false
     )
 
-    /*
     println("\n\n")
-    for (element <- dem_spells.collect()) {
+    for (element <- Pito_spells.collect()) {
       element.selfPrint()
     }
     println("\n\n")
-     */
-    println(Pito_spells.count())
   }
 }
 
